@@ -82,7 +82,8 @@ return [
 	*/
 
 	'require' => [
-		'platform/admin'
+		'platform/admin',
+		'ninjaparade/products'
 	],
 
 	/*
@@ -128,7 +129,13 @@ return [
 
 	'register' => function(ExtensionInterface $extension, Application $app)
 	{
+		//register cart
+		$app->register('Cartalyst\Cart\Laravel\CartServiceProvider');
+		Illuminate\Foundation\AliasLoader::getInstance()->alias('Cart', 'Cartalyst\Cart\Laravel\Facades\Cart');
 
+		//register converter
+		$app->register('Cartalyst\Converter\Laravel\ConverterServiceProvider');
+		Illuminate\Foundation\AliasLoader::getInstance()->alias('Converter', 'Cartalyst\Converter\Laravel\Facades\Converter');
 	},
 
 	/*
@@ -182,9 +189,10 @@ return [
 				Route::get('{id}/delete', 'CartsController@delete');
 			});
 
-			Route::group(['prefix' => 'cart/carts', 'namespace' => 'Frontend'], function()
+			Route::group(['prefix' => 'cart', 'namespace' => 'Frontend'], function()
 			{
 				Route::get('/', 'CartsController@index');
+				Route::get('/add/{id}', 'CartsController@add');
 			});
 		});
 	},
