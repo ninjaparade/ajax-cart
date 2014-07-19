@@ -2,6 +2,7 @@
 
 use Platform\Foundation\Controllers\BaseController;
 use View;
+use Store;
 
 class CartsController extends BaseController {
 
@@ -12,7 +13,12 @@ class CartsController extends BaseController {
 	 */
 	public function index()
 	{
-		return View::make('ninjaparade/cart::index');
+		
 	}
 
+	public function add($id)
+	{
+		$product = Store::find($id);
+	}
+	
 }
