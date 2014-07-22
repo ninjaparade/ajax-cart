@@ -56,7 +56,6 @@ class CartsController extends BaseController {
 	public function update()
 	{
 		
-
 		$updates = Input::get('update');
 		
 		$this->cart->update($updates);
@@ -67,6 +66,7 @@ class CartsController extends BaseController {
 
 	public function update_cart($id)
 	{
+		
 
 		if ( ! $product = Store::find($id))
 		{
@@ -75,6 +75,7 @@ class CartsController extends BaseController {
 
 		$quantity = Input::get('quantity');
 		
+
 		if( $update = $this->updateCart($product, $quantity) )
 		{
 			return Redirect::route('cart.index')->withSuccess("{$product->name} was successfully updated in your shopping cart.");
@@ -99,10 +100,11 @@ class CartsController extends BaseController {
 	protected function addToCart($product, $quantity)
 	{
 		$item = $this->cart->add([
-			'id'         => $product->id,
-			'name'       => $product->name,
-			'price'      => $product->price,
-			'quantity'   => $quantity
+			'id'       => $product->id,
+			'name'     => $product->name,
+			'price'    => $product->price,
+			'quantity' => $quantity,
+			'product'  => $product
 		]);
 	}
 
