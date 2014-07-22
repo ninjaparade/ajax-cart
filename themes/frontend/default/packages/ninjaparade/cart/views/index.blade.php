@@ -62,13 +62,13 @@
 							<td colspan="4">
 								<span class="pull-right">Subtotal</span>
 							</td>
-							<td>{{{ $cart->subtotal() }}}</td>
+							<td>{{{ Converter::value($cart->subtotal())->to('currency.usd')->format() }}}</td>
 						</tr>
 						<tr>
 							<td colspan="4">
 								<span class="pull-right">Subtotal (with discounts)</span>
 							</td>
-							<td>{{{ $cart->total('discount') }}}</td>
+							<td>{{{ Converter::value($cart->total('discount'))->to('currency.usd')->format() }}}</td>
 						</tr>
 
 						{{-- Items Discounts --}}
@@ -142,34 +142,25 @@
 						</tr>
 						@endforeach
 
-						<tr>
-							<td colspan="4">
-								<span class="pull-right">Cart Weight</span>
-							</td>
-							<td>{{{ Converter::value($cart->weight())->from('weight.g')->to('weight.kg')->format() }}}</td>
-						</tr>
+					
 
 						<tr>
 							<td colspan="4">
 								<span class="pull-right">Total Usd</span>
 							</td>
-							<td>{{{ $total }}}</td>
+							<td>{{{ Converter::value( $total )->to('currency.usd')->format() }}}</td>
 						</tr>
-						<tr>
-							<td colspan="4">
-								<span class="pull-right">Total Eur</span>
-							</td>
-							<td>{{{ Converter::value($total)->from('currency.usd')->to('currency.eur')->convert()->format() }}}</td>
-						</tr>
+						
 						@endif
 					</tbody>
 				</table>
 
 				@if ( ! $items->isEmpty())
 				<button type="submit" class="btn btn-info">Update</button>
-				<a href="{{ URL::to('cart/destroy') }}" class="btn btn-danger">Empty Cart</a>
+				<a href="{{ URL::route('cart.destroy') }}" class="btn btn-danger">Empty Cart</a>
 				<div class="pull-right">
-					<a href="#" class="btn btn-warning">Checkout</a>
+					<a href="#" class="btn btn-warning">Checkout</a><hr>
+					<a href="#" class="btn btn-warning">Back to store</a>
 				</div>
 				@endif
 
@@ -181,7 +172,7 @@
 
 			{{-- Form::open(array('route' => 'applyCoupon')) --}}
 
-			<div class="row">
+			<!-- <div class="row">
 
 				<div class="col-md-4">
 
@@ -195,12 +186,12 @@
 
 				</div>
 
-			</div>
+			</div> -->
 
-			<div class="form-group">
+			<!-- <div class="form-group">
 				<button class="btn">Apply Coupon</button>
 			</div>
-
+ -->
 			{{-- Form::close() --}}
 
 		</div>
