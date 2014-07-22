@@ -89,7 +89,12 @@ class CartsController extends BaseController {
 		return Redirect::back()->withSuccess("successfully removed fromy your cart");
 	}
 
+	public function destroy()
+	{
+		$this->cart->clear();
 
+		return Redirect::to('store')->withSuccess("successfully removed fromy your cart");
+	}
 
 	protected function addToCart($product, $quantity)
 	{
