@@ -43,7 +43,7 @@
 
 		<tr>
 			<td colspan="3">
-				<button type="submit" class="contact-btn">Update</button>
+				<button type="submit" class="btn btn-default">Update</button>
 			</td>
 			<td class="right">
 				Total {{{ Converter::value( $total )->to('currency.usd')->format() }}}
@@ -57,9 +57,9 @@
 
 
 <div>
-	<a class="button success" href="{{URL::route('store.index')}}" title="Back To Store">Back To Store</a>
-	<a class="button " href="{{URL::route('cart.destroy')}}" title="Empty Cart">Empty Cart</a>
-	<a class="button success" href="{{URL::route('checkout.index')}}" title="Checkout">Checkout</a>
+	<a class="btn btn-primary" href="{{URL::route('store.index')}}" title="Back To Store">Back To Store</a>
+	<a class="btn btn-danger" href="{{URL::route('cart.destroy')}}" title="Empty Cart">Empty Cart</a>
+	<a class="btn btn-success" href="{{URL::route('checkout.index')}}" title="Checkout">Checkout</a>
 	
 </div>
 {{Form::close()}}
