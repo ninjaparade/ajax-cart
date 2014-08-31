@@ -5,7 +5,9 @@ use View;
 use Store;
 use Input;
 use Redirect;
-
+use Response;
+use Request;
+use Converter;
 
 class CartsController extends BaseController {
 
@@ -49,7 +51,15 @@ class CartsController extends BaseController {
 
 		$this->addToCart($product, $quantity);
 
-		return Redirect::route('cart.index')->withSuccess("{$product->name} was successfully added to the shopping cart.");
+		if (Request::ajax())
+		{
+		    return $this->ajaxCartResponse();
+		}
+
+		return Redirect::route('cart.index')
+			->withSuccess("{$product->name} was successfully added to the shopping cart.");	
+		
+		
 
 	}
 
@@ -60,7 +70,16 @@ class CartsController extends BaseController {
 		
 		$this->cart->update($updates);
 
-		return Redirect::route('cart.index')->withSuccess('Cart was successfully updated.');
+		if (Request::ajax())
+		{
+		    return $this->ajaxCartResponse();
+		    
+		}
+			
+		
+		return Redirect::route('cart.index')
+			->withSuccess('Cart was successfully updated.');
+		
 	}
 
 
@@ -78,16 +97,33 @@ class CartsController extends BaseController {
 
 		if( $update = $this->updateCart($product, $quantity) )
 		{
-			return Redirect::route('cart.index')->withSuccess("{$product->name} was successfully updated in your shopping cart.");
+			if (Request::ajax())
+			{
+			    return $this->ajaxCartResponse();
+			    
+			}
+
+			return Redirect::route('cart.index')
+				->withSuccess("{$product->name} was successfully updated in your shopping cart.");
+			
 		}
 
 	}
 
 	public function remove($rowId)
 	{
-		$this->cart->remove($rowId);
+		if( $remove = $this->cart->remove($rowId))
+		{
 
-		return Redirect::back()->withSuccess("successfully removed fromy your cart");
+			if (Request::ajax())
+			{
+			    return $this->ajaxCartResponse();
+			    
+			}
+
+			return Redirect::back()
+				->withSuccess("successfully removed fromy your cart");
+		}
 	}
 
 	public function destroy()
@@ -119,9 +155,18 @@ class CartsController extends BaseController {
 
 		$rowId = $item[0]->get('rowId');
 
-		$this->cart->update($rowId, ['quantity' => $quantity]);
+		$row = $this->cart->update($rowId, ['quantity' => $quantity]);
 
 		return true;
 
+	}
+
+	protected function ajaxCartResponse()
+	{
+		return Response::json([
+			'success' => true, 
+			'count' =>  $this->cart->items()->count(),
+			'total' => Converter::value($this->cart->total())->to('currency.usd')->format()
+		]);
 	}
 }
