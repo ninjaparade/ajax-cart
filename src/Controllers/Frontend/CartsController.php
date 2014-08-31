@@ -11,9 +11,9 @@ use Converter;
 
 class CartsController extends BaseController {
 
+	//cart instance
 
 	protected $cart;
-
 
 	public function __construct() {
 		
@@ -41,7 +41,6 @@ class CartsController extends BaseController {
 
 	public function add($id)
 	{
-		
 		if ( ! $product = Store::find($id))
 		{
 			return Redirect::to('/');
@@ -49,18 +48,15 @@ class CartsController extends BaseController {
 
 		$quantity = Input::get('quantity');
 
-		$this->addToCart($product, $quantity);
+		$item = $this->addToCart($product, $quantity);
 
 		if (Request::ajax())
 		{
-		    return $this->ajaxCartResponse();
+		    return $this->ajaxCartResponse("{$product->name} was successfully added to the shopping cart.", $item);
 		}
 
 		return Redirect::route('cart.index')
-			->withSuccess("{$product->name} was successfully added to the shopping cart.");	
-		
-		
-
+			->withSuccess("{$product->name} was successfully added to the shopping cart.");
 	}
 
 	public function update()
@@ -72,7 +68,7 @@ class CartsController extends BaseController {
 
 		if (Request::ajax())
 		{
-		    return $this->ajaxCartResponse();
+		    return $this->ajaxCartResponse('Cart was successfully updated.');
 		    
 		}
 			
@@ -82,11 +78,8 @@ class CartsController extends BaseController {
 		
 	}
 
-
 	public function update_cart($id)
 	{
-		
-
 		if ( ! $product = Store::find($id))
 		{
 			return Redirect::back()->withErrors('No product found');
@@ -99,15 +92,12 @@ class CartsController extends BaseController {
 		{
 			if (Request::ajax())
 			{
-			    return $this->ajaxCartResponse();
-			    
+			    return $this->ajaxCartResponse("{$product->name} was successfully updated in your shopping cart.", $update);
 			}
 
 			return Redirect::route('cart.index')
-				->withSuccess("{$product->name} was successfully updated in your shopping cart.");
-			
+				->withSuccess("{$product->name} was successfully updated in your shopping cart.");	
 		}
-
 	}
 
 	public function remove($rowId)
@@ -117,7 +107,7 @@ class CartsController extends BaseController {
 
 			if (Request::ajax())
 			{
-			    return $this->ajaxCartResponse();
+			    return $this->ajaxCartResponse("successfully removed fromy your cart");
 			    
 			}
 
@@ -133,7 +123,7 @@ class CartsController extends BaseController {
 		return Redirect::to('store')->withSuccess("successfully removed fromy your cart");
 	}
 
-	protected function addToCart($product, $quantity)
+	protected function addToCart($product, $quantity, $ajax = true)
 	{
 		$item = $this->cart->add([
 			'id'       => $product->id,
@@ -142,12 +132,21 @@ class CartsController extends BaseController {
 			'quantity' => $quantity,
 			'product'  => $product
 		]);
+
+		if($ajax)
+		{
+			return $item->toArray();	
+
+		}else{
+
+			return $item;
+		}
+		
 	}
 
 	protected function updateCart($product, $quantity)
 	{
 		
-
 		if( ! $item = $this->cart->find( ['id' => $product->id] ))
 		{
 			return false;
@@ -157,16 +156,18 @@ class CartsController extends BaseController {
 
 		$row = $this->cart->update($rowId, ['quantity' => $quantity]);
 
-		return true;
+		return [ 'status' => 'success', 'quantity' => $quantity ];
 
 	}
 
-	protected function ajaxCartResponse()
+	protected function ajaxCartResponse($message = 'success', $meta = [] )
 	{
 		return Response::json([
 			'success' => true, 
-			'count' =>  $this->cart->items()->count(),
-			'total' => Converter::value($this->cart->total())->to('currency.usd')->format()
+			'count'   =>  $this->cart->items()->count(),
+			'total'   => Converter::value($this->cart->total())->to('currency.usd')->format(),
+			'message' => $message,
+			'meta'    => $meta
 		]);
 	}
 }
