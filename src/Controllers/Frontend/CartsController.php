@@ -164,7 +164,7 @@ class CartsController extends BaseController {
 	{
 		return Response::json([
 			'success' => true, 
-			'count'   =>  $this->cart->items()->count(),
+			'count'   =>  $this->cart->quantity(),
 			'total'   => Converter::value($this->cart->total())->to('currency.usd')->format(),
 			'message' => $message,
 			'meta'    => $meta
