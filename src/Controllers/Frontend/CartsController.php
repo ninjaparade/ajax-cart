@@ -17,7 +17,6 @@ class CartsController extends BaseController {
 
     public function __construct()
     {
-
         parent::__construct();
 
         $this->cart = app('cart');
@@ -50,7 +49,7 @@ class CartsController extends BaseController {
 
         $quantity = Input::get('quantity');
 
-        $item = $this->addToCart($product, $quantity);
+        $item = $this->updateCart($product, $quantity);
 
         if ( Request::ajax() )
         {
@@ -71,7 +70,6 @@ class CartsController extends BaseController {
         if ( Request::ajax() )
         {
             return $this->ajaxCartResponse('Cart was successfully updated.');
-
         }
 
 
@@ -89,7 +87,6 @@ class CartsController extends BaseController {
 
         $quantity = Input::get('quantity');
 
-
         if ( $update = $this->updateCart($product, $quantity) )
         {
             if ( Request::ajax() )
@@ -106,7 +103,6 @@ class CartsController extends BaseController {
     {
         if ( $remove = $this->cart->remove($rowId) )
         {
-
             if ( Request::ajax() )
             {
                 return $this->ajaxCartResponse("successfully removed fromy your cart");
@@ -118,6 +114,22 @@ class CartsController extends BaseController {
         }
     }
 
+    public function remove_get()
+    {
+    	$rowId = Input::get('rowId');
+
+        if ( $remove = $this->cart->remove($rowId) )
+        {
+            if ( Request::ajax() )
+            {
+                $items = $this->cart->items();
+
+                return View::make('ninjaparade/cart::cart-form', compact('items'));
+            }
+
+        }
+    }
+
     public function destroy()
     {
         $this->cart->clear();
@@ -125,7 +137,7 @@ class CartsController extends BaseController {
         return Redirect::to('store')->withSuccess("successfully removed fromy your cart");
     }
 
-    protected function addToCart($product, $quantity, $ajax = true)
+    protected function updateCart($product, $quantity, $ajax = true)
     {
         if ( $row = $this->cart->find(['id' => $product->id]) )
         {
@@ -145,32 +157,13 @@ class CartsController extends BaseController {
             ]);
         }
 
-
         if ( $ajax )
         {
             return $item->toArray();
-
         } else
         {
-
             return $item;
         }
-
-    }
-
-    protected function updateCart($product, $quantity)
-    {
-
-        if ( !$item = $this->cart->find(['id' => $product->id]) )
-        {
-            return false;
-        }
-
-        $rowId = $item[0]->get('rowId');
-
-        $row = $this->cart->update($rowId, ['quantity' => $quantity]);
-
-        return ['status' => 'success', 'quantity' => $quantity];
 
     }
 
