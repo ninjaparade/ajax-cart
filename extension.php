@@ -195,7 +195,8 @@ return [
 				Route::get('/',				 ['as' => 'cart.index', 'uses' => 'CartsController@index'       ] );
 				Route::post('{id}/add/', 	['as' => 'cart.add', 'uses' => 'CartsController@add'           ] );
 				Route::post('{id}/remove/', ['as' => 'cart.remove', 'uses' => 'CartsController@remove'     ] );
-				Route::post('{id}/update/', ['as' => 'cart.update', 'uses' => 'CartsController@update_cart'] );
+                Route::post('remove/item', ['as' => 'cart.remove_get', 'uses' => 'CartsController@remove_get'     ] );
+                Route::post('{id}/update/', ['as' => 'cart.update', 'uses' => 'CartsController@update_cart'] );
 				Route::post('update', ['as' => 'cart.cart_update', 'uses' => 'CartsController@update'] );
 				Route::get( 'empty', 		['as' => 'cart.destroy', 'uses' => 'CartsController@destroy'   ] );
 				
