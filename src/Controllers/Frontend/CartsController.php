@@ -1,173 +1,187 @@
 <?php namespace Ninjaparade\Cart\Controllers\Frontend;
 
-use Platform\Foundation\Controllers\BaseController;
-use View;
-use Store;
-use Input;
-use Redirect;
-use Response;
-use Request;
 use Converter;
+use Input;
+use Platform\Foundation\Controllers\BaseController;
+use Redirect;
+use Request;
+use Response;
+use Store;
+use View;
 
 class CartsController extends BaseController {
 
-	//cart instance
+    //cart instance
 
-	protected $cart;
+    protected $cart;
 
-	public function __construct() {
-		
-		parent::__construct();
+    public function __construct()
+    {
 
-		$this->cart = app('cart');
-	}
-	/**
-	 * Return the main view.
-	 *
-	 * @return \Illuminate\View\View
-	 */
-	public function index()
-	{
-		$cart = $this->cart;
+        parent::__construct();
 
-		$items = $cart->items();
+        $this->cart = app('cart');
+    }
 
-		$total = $cart->total();
+    /**
+     * Return the main view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index()
+    {
+        $cart = $this->cart;
 
-		$coupon = $cart->conditions('coupon');
+        $items = $cart->items();
 
-		return View::make('ninjaparade/cart::index', compact('cart', 'items', 'total', 'coupon'));
-	}
+        $total = $cart->total();
 
-	public function add($id)
-	{
-		if ( ! $product = Store::find($id))
-		{
-			return Redirect::to('/');
-		}
+        $coupon = $cart->conditions('coupon');
 
-		$quantity = Input::get('quantity');
+        return View::make('ninjaparade/cart::index', compact('cart', 'items', 'total', 'coupon'));
+    }
 
-		$item = $this->addToCart($product, $quantity);
+    public function add($id)
+    {
+        if ( !$product = Store::find($id) )
+        {
+            return Redirect::to('/');
+        }
 
-		if (Request::ajax())
-		{
-		    return $this->ajaxCartResponse("{$product->name} was successfully added to the shopping cart.", $item);
-		}
+        $quantity = Input::get('quantity');
 
-		return Redirect::route('cart.index')
-			->withSuccess("{$product->name} was successfully added to the shopping cart.");
-	}
+        $item = $this->addToCart($product, $quantity);
 
-	public function update()
-	{
-		
-		$updates = Input::get('update');
-		
-		$this->cart->update($updates);
+        if ( Request::ajax() )
+        {
+            return $this->ajaxCartResponse("{$product->name} was successfully added to the shopping cart.", $item);
+        }
 
-		if (Request::ajax())
-		{
-		    return $this->ajaxCartResponse('Cart was successfully updated.');
-		    
-		}
-			
-		
-		return Redirect::route('cart.index')
-			->withSuccess('Cart was successfully updated.');
-		
-	}
+        return Redirect::route('cart.index')
+            ->withSuccess("{$product->name} was successfully added to the shopping cart.");
+    }
 
-	public function update_cart($id)
-	{
-		if ( ! $product = Store::find($id))
-		{
-			return Redirect::back()->withErrors('No product found');
-		}
+    public function update()
+    {
 
-		$quantity = Input::get('quantity');
-		
+        $updates = Input::get('update');
 
-		if( $update = $this->updateCart($product, $quantity) )
-		{
-			if (Request::ajax())
-			{
-			    return $this->ajaxCartResponse("{$product->name} was successfully updated in your shopping cart.", $update);
-			}
+        $this->cart->update($updates);
 
-			return Redirect::route('cart.index')
-				->withSuccess("{$product->name} was successfully updated in your shopping cart.");	
-		}
-	}
+        if ( Request::ajax() )
+        {
+            return $this->ajaxCartResponse('Cart was successfully updated.');
 
-	public function remove($rowId)
-	{
-		if( $remove = $this->cart->remove($rowId))
-		{
+        }
 
-			if (Request::ajax())
-			{
-			    return $this->ajaxCartResponse("successfully removed fromy your cart");
-			    
-			}
 
-			return Redirect::back()
-				->withSuccess("successfully removed fromy your cart");
-		}
-	}
+        return Redirect::route('cart.index')
+            ->withSuccess('Cart was successfully updated.');
 
-	public function destroy()
-	{
-		$this->cart->clear();
+    }
 
-		return Redirect::to('store')->withSuccess("successfully removed fromy your cart");
-	}
+    public function update_cart($id)
+    {
+        if ( !$product = Store::find($id) )
+        {
+            return Redirect::back()->withErrors('No product found');
+        }
 
-	protected function addToCart($product, $quantity, $ajax = true)
-	{
-		$item = $this->cart->add([
-			'id'       => $product->id,
-			'name'     => $product->name,
-			'price'    => $product->price,
-			'quantity' => $quantity,
-			'product'  => $product
-		]);
+        $quantity = Input::get('quantity');
 
-		if($ajax)
-		{
-			return $item->toArray();	
 
-		}else{
+        if ( $update = $this->updateCart($product, $quantity) )
+        {
+            if ( Request::ajax() )
+            {
+                return $this->ajaxCartResponse("{$product->name} was successfully updated in your shopping cart.", $update);
+            }
 
-			return $item;
-		}
-		
-	}
+            return Redirect::route('cart.index')
+                ->withSuccess("{$product->name} was successfully updated in your shopping cart.");
+        }
+    }
 
-	protected function updateCart($product, $quantity)
-	{
-		
-		if( ! $item = $this->cart->find( ['id' => $product->id] ))
-		{
-			return false;
-		}
+    public function remove($rowId)
+    {
+        if ( $remove = $this->cart->remove($rowId) )
+        {
 
-		$rowId = $item[0]->get('rowId');
+            if ( Request::ajax() )
+            {
+                return $this->ajaxCartResponse("successfully removed fromy your cart");
 
-		$row = $this->cart->update($rowId, ['quantity' => $quantity]);
+            }
 
-		return [ 'status' => 'success', 'quantity' => $quantity ];
+            return Redirect::back()
+                ->withSuccess("successfully removed fromy your cart");
+        }
+    }
 
-	}
+    public function destroy()
+    {
+        $this->cart->clear();
 
-	protected function ajaxCartResponse($message = 'success', $meta = [] )
-	{
-		return Response::json([
-			'success' => true, 
-			'count'   =>  $this->cart->quantity(),
-			'total'   => Converter::value($this->cart->total())->to('currency.usd')->format(),
-			'message' => $message,
-			'meta'    => $meta
-		]);
-	}
+        return Redirect::to('store')->withSuccess("successfully removed fromy your cart");
+    }
+
+    protected function addToCart($product, $quantity, $ajax = true)
+    {
+        if ( $row = $this->cart->find(['id' => $product->id]) )
+        {
+
+            $rowId = $row[0]->get('rowId');
+
+            $item = $this->cart->update($rowId, ['quantity' => $quantity]);
+
+        } else
+        {
+            $item = $this->cart->add([
+                'id'       => $product->id,
+                'name'     => $product->name,
+                'price'    => $product->price,
+                'quantity' => $quantity,
+                'product'  => $product
+            ]);
+        }
+
+
+        if ( $ajax )
+        {
+            return $item->toArray();
+
+        } else
+        {
+
+            return $item;
+        }
+
+    }
+
+    protected function updateCart($product, $quantity)
+    {
+
+        if ( !$item = $this->cart->find(['id' => $product->id]) )
+        {
+            return false;
+        }
+
+        $rowId = $item[0]->get('rowId');
+
+        $row = $this->cart->update($rowId, ['quantity' => $quantity]);
+
+        return ['status' => 'success', 'quantity' => $quantity];
+
+    }
+
+    protected function ajaxCartResponse($message = 'success', $meta = [])
+    {
+        return Response::json([
+            'success' => true,
+            'count'   => $this->cart->quantity(),
+            'total'   => Converter::value($this->cart->total())->to('currency.usd')->format(),
+            'message' => $message,
+            'meta'    => $meta
+        ]);
+    }
 }
