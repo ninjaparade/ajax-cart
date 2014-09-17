@@ -3,64 +3,70 @@
 @section('content')
 
 
-
-
-{{ Form::open(array('url' => URL::route('cart.cart_update'), 'method' => 'post', 'class'=>'form-inline'))}}
-<table>
-  <thead>
-    <tr>
-      <th width="25%">Name</th>
-      <th width="25%">Quantity</th>
-      <th width="25%">Price</th>
-      <th width="25%">Total</th>
-    </tr>
-  </thead>
-  <tbody>
-  	@if ($items->isEmpty())
-	<tr>
-		<td colspan="4">Your shopping cart is empty.</td>
-	</tr>
-	@else
-		@foreach ($items as $item)
-	<tr>
-		<td>
-			<div class="col-md-2">
-				<img src="http://placehold.it/80x80" alt="..." class="img-thumbnail">
-			</div>
-
-		{{{ $item->get('name') }}}
-		</td>
-		<td>
-		<input class="form-control" type="text" name="update[{{{ $item->get('rowId') }}}][quantity]" value="{{{ $item->get('quantity') }}}" />
-		</td>
-		<td>{{{ Converter::value($item->get('price'))->to('currency.usd')->format() }}}</td>
-		<td>{{{ Converter::value($item->total())->to('currency.usd')->format() }}}</td>
-		<td>
-
-		</td>
-	</tr>
-		@endforeach
-
-		<tr>
-			<td colspan="3">
-				<button type="submit" class="btn btn-default">Update</button>
-			</td>
-			<td class="right">
-				Total {{{ Converter::value( $total )->to('currency.usd')->format() }}}
-			</td>
-		</tr>
-	@endif
-
-  
-  </tbody>
-</table>
-
-
-<div>
-	<a class="btn btn-primary" href="{{URL::route('store.index')}}" title="Back To Store">Back To Store</a>
-	<a class="btn btn-danger" href="{{URL::route('cart.destroy')}}" title="Empty Cart">Empty Cart</a>
-	<a class="btn btn-success" href="{{URL::route('checkout.index')}}" title="Checkout">Checkout</a>
-	
+<div id="content-wrapper">
+    <div id="page-background"></div>
+    <div class="inner-page-wrapper">
+        <h1>your shopping cart</h1>
+        <div class="form-wrapper" id="cart-form-wrapper">
+            @include('ninjaparade/cart::cart-form')
+        </div>
+        <div class="page-sidebar">
+            @include('ninjaparade/cart::cart-summary')
+        </div>
+    </div>
 </div>
-{{Form::close()}}
+
+@stop
+
+
+
+@section('scripts')
+<script>
+
+    $("#update-cart").hide();
+
+    $( ".qty" ).click(function() {
+        $("#update-cart").show();
+    });
+
+    var url = "{{URL::route('cart.remove_get')}}";
+
+
+    $('#cart-form-wrapper').on('click', '.remove-item', function(event){
+        event.preventDefault();
+        var rowId = $(this).data('row-id');
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: 'json',
+            data: {rowId : rowId, _token: "{{csrf_token()}}"}
+        })
+        .done(function(response) {
+            
+            $.ajax({
+                url: "{{URL::route('cart.get_cart')}}",
+                type: 'POST',
+                dataType: 'html',
+                data: {_token: "{{csrf_token()}}"},
+            })
+            .done(function(response) {
+                $('#cart-form-wrapper').html(response);
+            })
+            .fail(function() {
+                
+            })
+            .always(function() {
+                
+            });
+        })
+        .fail(function() {
+            console.log("error");
+        })
+        .always(function(response) {
+            $('.cart-nav').next('span').html(" (" + response.quantity + " ) ");
+        });
+        
+    });
+</script>
 @stop
