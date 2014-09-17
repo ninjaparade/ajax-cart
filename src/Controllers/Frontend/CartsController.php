@@ -36,6 +36,7 @@ class CartsController extends BaseController {
         $total = $cart->total();
 
         $coupon = $cart->conditions('coupon');
+        $coupon = $cart->conditions('discount');
 
         return View::make('ninjaparade/cart::index', compact('cart', 'items', 'total', 'coupon'));
     }
