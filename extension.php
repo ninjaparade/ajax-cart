@@ -199,6 +199,7 @@ return [
                 Route::post('{id}/update/', ['as' => 'cart.update', 'uses' => 'CartsController@update_cart'] );
 				Route::post('update', ['as' => 'cart.cart_update', 'uses' => 'CartsController@update'] );
 				Route::get( 'empty', 		['as' => 'cart.destroy', 'uses' => 'CartsController@destroy'   ] );
+				Route::post( '/', 		['as' => 'cart.get_cart', 'uses' => 'CartsController@getCart'   ] );
 				
 			});
 		});
