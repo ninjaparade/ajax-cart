@@ -35,8 +35,29 @@ class CartsController extends BaseController {
 
         $total = $cart->total();
 
-        $coupon = $cart->conditions('coupon');
         $coupon = $cart->conditions('discount');
+
+  //       $condition = new Condition([
+		//     'name'   => 'VAT (12.5%)',
+		//     'type'   => 'discount',
+		//     'target' => 'subtotal',
+		// ]);
+
+		// $condition->setActions([
+		//     [
+		//         'value' => '-5%',
+		//     ],
+
+		// ]);
+
+		// $this->cart->condition($condition);
+
+
+		// $this->cart->setItemsConditionsOrder([
+		//     'discount',
+		//     'tax',
+		//     'shipping',
+		// ]);
 
         return View::make('ninjaparade/cart::index', compact('cart', 'items', 'total', 'coupon'));
     }
