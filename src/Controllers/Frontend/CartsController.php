@@ -1,5 +1,6 @@
 <?php namespace Ninjaparade\Cart\Controllers\Frontend;
 
+use Cartalyst\Conditions\Condition;
 use Converter;
 use Input;
 use Platform\Foundation\Controllers\BaseController;
@@ -139,17 +140,34 @@ class CartsController extends BaseController {
     public function remove_get()
     {
     	$rowId = Input::get('rowId');
+    	if( ! $this->cart->item($rowId))
+    	{
+    		 $items = $this->cart->items();
+
+              return Response::json([ 
+              		'status' => 0,
+                	'message' => "Could not find item in cart"
+              ]);
+    	}
 
         if ( $remove = $this->cart->remove($rowId) )
         {
             if ( Request::ajax() )
             {
-                $items = $this->cart->items();
-
-                return View::make('ninjaparade/cart::cart-form', compact('items'));
+                return Response::json([
+                	'quantity' => $this->cart->quantity(),
+                	'message' => "Successfully Removed"
+                ]);
             }
 
         }
+    }
+
+    public function getCart()
+    {
+    	$items = $this->cart->items();
+    	
+    	return View::make('ninjaparade/cart::cart-form', compact('items'));
     }
 
     public function destroy()
