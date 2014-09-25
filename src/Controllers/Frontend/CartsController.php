@@ -193,7 +193,8 @@ class CartsController extends BaseController {
                 'name'     => $product->name,
                 'price'    => $product->price,
                 'quantity' => $quantity,
-                'product'  => $product
+                'product'  => $product,
+                'image'    => URL::to("media/view/{$product->product_image->path}")
             ]);
         }
 
