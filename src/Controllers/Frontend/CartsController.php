@@ -1,6 +1,5 @@
 <?php namespace Ninjaparade\Cart\Controllers\Frontend;
 
-use Cartalyst\Conditions\Condition;
 use Converter;
 use Input;
 use Platform\Foundation\Controllers\BaseController;
@@ -8,12 +7,12 @@ use Redirect;
 use Request;
 use Response;
 use Store;
+use URL;
 use View;
 
 class CartsController extends BaseController {
 
     //cart instance
-
     protected $cart;
 
     public function __construct()
@@ -37,28 +36,6 @@ class CartsController extends BaseController {
         $total = $cart->total();
 
         $coupon = $cart->conditions('discount');
-
-  //       $condition = new Condition([
-		//     'name'   => 'VAT (12.5%)',
-		//     'type'   => 'discount',
-		//     'target' => 'subtotal',
-		// ]);
-
-		// $condition->setActions([
-		//     [
-		//         'value' => '-5%',
-		//     ],
-
-		// ]);
-
-		// $this->cart->condition($condition);
-
-
-		// $this->cart->setItemsConditionsOrder([
-		//     'discount',
-		//     'tax',
-		//     'shipping',
-		// ]);
 
         return View::make('ninjaparade/cart::index', compact('cart', 'items', 'total', 'coupon'));
     }
@@ -139,24 +116,25 @@ class CartsController extends BaseController {
 
     public function remove_get()
     {
-    	$rowId = Input::get('rowId');
-    	if( ! $this->cart->item($rowId))
-    	{
-    		 $items = $this->cart->items();
+        $rowId = Input::get('rowId');
 
-              return Response::json([ 
-              		'status' => 0,
-                	'message' => "Could not find item in cart"
-              ]);
-    	}
+        if ( !$this->cart->item($rowId) )
+        {
+            $items = $this->cart->items();
+
+            return Response::json([
+                'status'  => 0,
+                'message' => "Could not find item in cart"
+            ]);
+        }
 
         if ( $remove = $this->cart->remove($rowId) )
         {
             if ( Request::ajax() )
             {
                 return Response::json([
-                	'quantity' => $this->cart->quantity(),
-                	'message' => "Successfully Removed"
+                    'quantity' => $this->cart->quantity(),
+                    'message'  => "Successfully Removed"
                 ]);
             }
 
@@ -165,9 +143,16 @@ class CartsController extends BaseController {
 
     public function getCart()
     {
-    	$items = $this->cart->items();
-    	
-    	return View::make('ninjaparade/cart::cart-form', compact('items'));
+        $items = $this->cart->items();
+
+        return View::make('ninjaparade/cart::cart-form', compact('items'));
+    }
+
+    public function getCartModal()
+    {
+        $items = $this->cart->items();
+
+        return View::make('ninjaparade/cart::cart-modal-template', compact('items'));
     }
 
     public function destroy()
