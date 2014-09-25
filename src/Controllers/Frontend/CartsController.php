@@ -215,6 +215,7 @@ class CartsController extends BaseController {
             'count'   => $this->cart->quantity(),
             'total'   => Converter::value($this->cart->total())->to('currency.usd')->format(),
             'message' => $message,
+            'content' => $this->cart->items(),
             'meta'    => $meta
         ]);
     }
