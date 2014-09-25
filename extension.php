@@ -200,6 +200,7 @@ return [
 				Route::post('update', ['as' => 'cart.cart_update', 'uses' => 'CartsController@update'] );
 				Route::get( 'empty', 		['as' => 'cart.destroy', 'uses' => 'CartsController@destroy'   ] );
 				Route::post( '/', 		['as' => 'cart.get_cart', 'uses' => 'CartsController@getCart'   ] );
+                Route::get('/get/modal', ['as' => 'cart.get_modal', 'uses' => 'CartsController@getCartModal']);
 				
 			});
 		});
