@@ -114,49 +114,23 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
-	| Register Callback
+	| Service Providers
 	|--------------------------------------------------------------------------
 	|
-	| Closure that is called when the extension is registered. This can do
-	| all the needed custom logic upon registering.
 	|
-	| The closure parameters are:
 	|
-	|	object \Cartalyst\Extensions\ExtensionInterface  $extension
-	|	object \Illuminate\Foundation\Application        $app
+	|
+	|
+	|
+	|
+	|
 	|
 	*/
 
-	'register' => function(ExtensionInterface $extension, Application $app)
-	{
-		//register cart
-		$app->register('Cartalyst\Cart\Laravel\CartServiceProvider');
-		Illuminate\Foundation\AliasLoader::getInstance()->alias('Cart', 'Cartalyst\Cart\Laravel\Facades\Cart');
+    'providers' => [
+        'Ninjaparade\Cart\CartServiceProvider'
+    ],
 
-		//register converter
-		$app->register('Cartalyst\Converter\Laravel\ConverterServiceProvider');
-		Illuminate\Foundation\AliasLoader::getInstance()->alias('Converter', 'Cartalyst\Converter\Laravel\Facades\Converter');
-	},
-
-	/*
-	|--------------------------------------------------------------------------
-	| Boot Callback
-	|--------------------------------------------------------------------------
-	|
-	| Closure that is called when the extension is booted. This can do
-	| all the needed custom logic upon booting.
-	|
-	| The closure parameters are:
-	|
-	|	object \Cartalyst\Extensions\ExtensionInterface  $extension
-	|	object \Illuminate\Foundation\Application        $app
-	|
-	*/
-
-	'boot' => function(ExtensionInterface $extension, Application $app)
-	{
-
-	},
 
 	/*
 	|--------------------------------------------------------------------------
@@ -314,29 +288,7 @@ return [
 	*/
 
 	'menus' => [
-
-		'admin' => [
-
-			[
-				'slug'  => 'admin-ninjaparade-cart',
-				'name'  => 'Cart',
-				'class' => 'fa fa-circle-o',
-				'uri'   => 'cart',
-			],
-
-		],
-
-		'main' => [
-
-			[
-				'slug'  => 'main-ninjaparade-cart',
-				'name'  => 'Cart',
-				'class' => 'fa fa-circle-o',
-				'uri'   => 'cart',
-			],
-
-		],
-
+        
 	],
 
 ];
