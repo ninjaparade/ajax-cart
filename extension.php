@@ -82,7 +82,7 @@ return [
 	*/
 
 	'require' => [
-		'platform/admin',
+        'platform/access',
 		'ninjaparade/products'
 	],
 
