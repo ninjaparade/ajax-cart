@@ -2,7 +2,7 @@
 
 use Converter;
 use Input;
-use Platform\Foundation\Controllers\Controller;
+use Platform\Foundation\Controllers\BaseController;
 use Redirect;
 use Request;
 use Response;
@@ -10,7 +10,7 @@ use Store;
 use URL;
 use View;
 
-class CartsController extends Controller {
+class CartsController extends BaseController {
 
     //cart instance
     protected $cart;
