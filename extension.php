@@ -128,7 +128,8 @@ return [
 	*/
 
     'providers' => [
-        'Ninjaparade\Cart\CartServiceProvider'
+        'Ninjaparade\Cart\CartServiceProvider',
+        'Ninjaparade\Cart\EventsServiceProvider'
     ],
 
 
