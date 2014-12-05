@@ -1,14 +1,25 @@
 <?php  namespace Ninjaparade\Cart\Handlers;
 
 use Cartalyst\Conditions\Condition;
+use  Ninjaparade\Platformcheckout\Repositories\Promocode\PromocodeRepositoryInterface;
 
 class PromocodeHandler {
 
+    //PromocodeRepositoryInterface
+    protected $promocode;
+
     protected $cart;
 
-    function __construct()
+    protected $dispatcher;
+
+
+    function __construct(PromocodeRepositoryInterface $promocode )
     {
         $this->cart = app('cart');
+
+        $this->dispatcher = app('events');
+
+        $this->promocode = $promocode;
     }
 
 
@@ -22,8 +33,21 @@ class PromocodeHandler {
             
             case 'percent_off':
                 $this->percentOff($promocode);
-                break;
+            break;
         }
+    }
+
+    public function usedPromocode($discount, $value)
+    {
+        $promocode = $this->promocode->find($discount->get('id'));
+
+        $promocode->increment('redeem_amount');
+
+        $promocode->increment('redeem_value', abs($value) );
+
+        $promocode->save();
+
+        return true;
     }
 
     protected function amountOff($promocode)
@@ -91,6 +115,8 @@ class PromocodeHandler {
     public function subscribe($events)
     {
         $events->listen('valide.promocode.apply', 'Ninjaparade\Cart\Handlers\PromocodeHandler@appplyPromocode');
+
+        $events->listen('valide.promocode.used', 'Ninjaparade\Cart\Handlers\PromocodeHandler@usedPromocode');
     }
 }
 
