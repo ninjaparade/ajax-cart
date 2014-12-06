@@ -85,15 +85,22 @@ class PromocodeHandler {
             'promocode_type' => $promocode->type
         ));
 
-        $condition->setActions([
-            [ 'value' => -number_format( $promocode->value , 2). '%'  ]
-        ]);
-    
         if($promocode->max_value > 0)
         {
-            $condition['max'] = -intval($promocode->max_value);
+            $condition->setActions([
+                [ 
+                    'value' => -number_format( $promocode->value , 2). '%',
+                    'max'   => -intval($promocode->max_value)
+                ]
+            ]);
+          
+        }else{
+
+            $condition->setActions([
+                [ 'value' => -number_format( $promocode->value , 2). '%'  ]
+            ]);
         }
-    
+        
         $this->cart->condition([ $condition ]);
 
         $this->setCartOrder();
