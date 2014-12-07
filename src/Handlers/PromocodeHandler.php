@@ -52,8 +52,8 @@ class PromocodeHandler {
 
     protected function amountOff($promocode)
     {
-        $this->cart->removeConditionByName('discount');
-
+        $this->cart->removeConditionByType('discount');
+        
         $condition = new Condition(array(
             'name'           => 'Discount ($' .$promocode->value. ') OFF', 
             'type'           => 'discount',
@@ -61,12 +61,14 @@ class PromocodeHandler {
             'id'             => $promocode->id,
             'promocode_type' => $promocode->type
         ));
-
+  
         $condition->setActions([
-            [ 'value' => -number_format($promocode->value , 2)]
+            [
+                'value' => -number_format($promocode->value , 2)
+            ]
         ]);
 
-
+  
         $this->cart->condition([ $condition ]);
 
         $this->setCartOrder();
@@ -75,8 +77,8 @@ class PromocodeHandler {
 
     protected function percentOff($promocode)
     {
-        $this->cart->removeConditionByName('discount');
-
+        $this->cart->removeConditionByType('discount');
+        
         $condition = new Condition(array(
             'name'           => 'Discount (' .$promocode->value. '%) OFF' ,
             'type'           => 'discount',
@@ -87,17 +89,21 @@ class PromocodeHandler {
 
         if($promocode->max_value > 0)
         {
+            $value = -number_format( $promocode->value , 2);
+            
             $condition->setActions([
-                [ 
-                    'value' => -number_format( $promocode->value , 2). '%',
+                [
+                    'value' => "{$value}%",
                     'max'   => -intval($promocode->max_value)
                 ]
             ]);
-          
-        }else{
 
+        }else{
+            $value = -number_format( $promocode->value , 2);
             $condition->setActions([
-                [ 'value' => -number_format( $promocode->value , 2). '%'  ]
+                [
+                    'value' => "{$value}%"
+                ]
             ]);
         }
         
